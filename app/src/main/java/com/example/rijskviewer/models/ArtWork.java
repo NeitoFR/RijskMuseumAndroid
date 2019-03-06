@@ -7,6 +7,10 @@ public class ArtWork {
     private String url;
     private int index;
 
+    public ArtWork(){
+        super();
+    }
+
     public ArtWork(String author, String title, String date, String url, int index)
     {
         this.author = author;
@@ -15,10 +19,6 @@ public class ArtWork {
         this.url = url;
         this.index = index;
     }
-    /*public Oeuvre()
-    {
-        this("No Artist", "No Title", "No Date", museumAPI.class.getClassLoader().getResource("Hearthstone.jpg").toString(), 9999);
-    }*/
 
     //Getters
     public String getAuthor() {

@@ -16,12 +16,14 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
+import com.example.rijskviewer.api.MuseumApi;
 import com.example.rijskviewer.models.ArtWork;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -29,7 +31,11 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    List<ArtWork> artWorkList = new ArrayList<>();
+    private static MainActivity mInstance;
+
+    private RequestQueue mRequestQueue;
+    private ArtWork artWork;
+    private List<ArtWork> artWorkList = new ArrayList<>();
 
     private ViewPager viewPager;
     private ListFragmentCollections adapter;
@@ -41,10 +47,15 @@ public class MainActivity extends AppCompatActivity
 
         ListView artWorkListView = (ListView) findViewById(R.id.studentsListView);
 
-        artWorkList.add(new ArtWork("firstAuthor", "firstTitle", "10-12-2016", "testUrl", 3));
-        artWorkList.add(new ArtWork("secondAuthor", "secondTitle", "06-03-2018", "testUrl", 4));
-        ArrayAdapter<ArtWork> arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, artWorkList);
+//        artWorkList.add(new ArtWork("firstAuthor", "firstTitle", "10-12-2016", "testUrl", 3));
+//        artWorkList.add(new ArtWork("secondAuthor", "secondTitle", "06-03-2018", "testUrl", 4));
 
+        mInstance = this;
+        mRequestQueue = Volley.newRequestQueue(getApplicationContext());
+
+        artWorkList = MuseumApi.getArtList();
+
+        ArrayAdapter<ArtWork> arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, artWorkList);
 
         artWorkListView.setAdapter(arrayAdapter);
 
@@ -72,6 +83,31 @@ public class MainActivity extends AppCompatActivity
         adapter = new ListFragmentCollections(getSupportFragmentManager());
         viewPager.setAdapter(adapter);
     }
+
+    public void readFromJson(JSONObject object){
+        if (object == null) {
+            return;
+        }
+
+        artWork = new ArtWork();
+
+        try {
+            artWork.setAuthor(object.getString("principalOrFirstMaker"));
+            artWork.setTitle(object.getString("title"));
+            artWork.setDate(object.getString("director"));
+
+            artWork.setUrl(object.getString("urlPoster"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+//    public static <T> void addToRequestQueue(Request<T> req, String tag) {
+//
+//        // set the default tag if tag is empty
+//        req.setTag(TextUtils.isEmpty(tag) ? LOG_TAG : tag);
+//        mInstance.mRequestQueue.add(req);
+//    }
 
     @Override
     public void onBackPressed() {
@@ -130,31 +166,70 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    public String get_risj(url) {
-        String token = "MvDNbZD9";
-        int nbImage = 100;
-        String name = "George%20Hendrik%20Breitner";
-        String artist_url = "https://www.rijksmuseum.nl/api/en/collection?key=" + token + "&ps=" + nbImage + "&format=json&principalMaker=" + name;
+//    public String get_risj(String url) {
+//        String token = "MvDNbZD9";
+//        int nbImage = 100;
+//        String name = "George%20Hendrik%20Breitner";
+//        String artist_url = "https://www.rijksmuseum.nl/api/en/collection?key=" + token + "&ps=" + nbImage + "&format=json&principalMaker=" + name;
+//
+//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+//                (Request.Method.GET, artist_url, null, new Response.Listener<JSONObject>() {
+//                    @Override
+//                    public void onResponse(JSONObject response) {
+////                                textView.setText("Response: " + response.toString());
+//                        System.out.println(response);
+//                    }
+//                }, new Response.ErrorListener() {
+//
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        // TODO: Handle error
+//                        System.out.println("error");
+//
+//                    }
+//                });
+//
+////                MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
+//        addToRequestQueue(jsonObjectRequest);
+//
+//    }
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, artist_url, null, new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-//                                textView.setText("Response: " + response.toString());
-                        System.out.println(response);
-                    }
-                }, new Response.ErrorListener() {
+//    public static void getString(
+//            int method,
+//            String url,
+//            final Map<String, String> headers,
+//            Response.Listener<String> listener,
+//            Response.ErrorListener errorListener,
+//            boolean putInCache)
+//    {
+//        System.out.println("getJSONObject url: " + url);
+//
+//        StringRequest jsonObjReq = new StringRequest(method, url, listener, errorListener) {
+//            @Override
+//            public Map<String, String> getHeaders() throws AuthFailureError {
+//                if (headers == null) {
+//                    return new LinkedHashMap<>(0);
+//                } else {
+//                    return headers;
+//                }
+//            }
+//        };
+//
+//        jsonObjReq.setShouldCache(putInCache);
+//        addRequestPolicy(jsonObjReq);
+//
+//        // Adding request to request queue
+//        addToRequestQueue(jsonObjReq, "req_object_" + url.hashCode());
+//    }
 
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // TODO: Handle error
-                        System.out.println("error");
-
-                    }
-                });
-
-//                MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
-        MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
-
+    public static void addRequestPolicy(Request<String> request)
+    {
+        request.setRetryPolicy(
+                new DefaultRetryPolicy(
+                        10000, // 10 000
+                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+                )
+        );
     }
 }
