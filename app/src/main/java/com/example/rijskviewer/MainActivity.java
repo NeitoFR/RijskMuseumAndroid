@@ -16,7 +16,13 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.rijskviewer.models.ArtWork;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +33,7 @@ public class MainActivity extends AppCompatActivity
 
     private ViewPager viewPager;
     private ListFragmentCollections adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,5 +128,33 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public String get_risj(url) {
+        String token = "MvDNbZD9";
+        int nbImage = 100;
+        String name = "George%20Hendrik%20Breitner";
+        String artist_url = "https://www.rijksmuseum.nl/api/en/collection?key=" + token + "&ps=" + nbImage + "&format=json&principalMaker=" + name;
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, artist_url, null, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+//                                textView.setText("Response: " + response.toString());
+                        System.out.println(response);
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // TODO: Handle error
+                        System.out.println("error");
+
+                    }
+                });
+
+//                MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
+        MySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
+
     }
 }
