@@ -11,7 +11,8 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.example.rijksmuseum.models.ArtWork;
+import com.example.rijskviewer.R;
+import com.example.rijskviewer.models.ArtWork;
 
 import java.util.ArrayList;
 import java.util.List;

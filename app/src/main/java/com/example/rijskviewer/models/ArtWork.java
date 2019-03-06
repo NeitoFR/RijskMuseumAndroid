@@ -1,4 +1,4 @@
-package com.example.rijksmuseum.models;
+package com.example.rijskviewer.models;
 
 public class ArtWork {
     private String author;
