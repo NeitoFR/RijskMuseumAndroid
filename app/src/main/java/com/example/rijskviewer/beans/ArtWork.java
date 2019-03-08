@@ -1,7 +1,7 @@
-package com.example.rijskviewer.models;
+package com.example.rijskviewer.beans;
 
-public class ArtWork {
-    private String author;
+public class ArtWork extends Artist {
+    private Artist author;
     private String title;
     private String date;
     private String url;
@@ -11,24 +11,7 @@ public class ArtWork {
         super();
     }
 
-    public ArtWork(String author, String title, String date, String url, int index)
-    {
-        this.author = author;
-        this.title = title;
-        this.date = date;
-        this.url = url;
-        this.index = index;
-    }
-
     //Getters
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
     public String getTitle() {
         return title;
     }

@@ -16,12 +16,9 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.example.rijskviewer.Interfaces.VolleyCallback;
 import com.example.rijskviewer.api.MuseumApi;
-import com.example.rijskviewer.models.ArtWork;
+import com.example.rijskviewer.beans.ArtWork;
 
 import org.json.JSONObject;
 
@@ -31,7 +28,6 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private MuseumApi museumApi;
-    private ArtWork artWork;
     private List<ArtWork> artWorkList = new ArrayList<>();
 
     private ViewPager viewPager;
@@ -43,14 +39,12 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         museumApi = new MuseumApi();
 
-        ListView artWorkListView = (ListView) findViewById(R.id.studentsListView);
+        ListView artWorkListView = (ListView) findViewById(R.id.studentsListView);;
 
-//        artWorkList.add(new ArtWork("firstAuthor", "firstTitle", "10-12-2016", "testUrl", 3));
-//        artWorkList.add(new ArtWork("secondAuthor", "secondTitle", "06-03-2018", "testUrl", 4));
+        // Remplacer artistName par le nom de l'artiste cliqué par l'utilisateur
+        String artistName = "George Hendrik Breitner";
+        artWorkList = museumApi.readFromJson(callVolleyCallback(), this.getApplicationContext(), artistName);
 
-
-        artWorkList = museumApi.readFromJson(callVolleyCallback(), this.getApplicationContext());
-        System.out.println("main activity : " + artWorkList);
         ArrayAdapter<ArtWork> arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, artWorkList);
 
         artWorkListView.setAdapter(arrayAdapter);
@@ -80,21 +74,18 @@ public class MainActivity extends AppCompatActivity
         viewPager.setAdapter(adapter);
     }
 
+    /**
+     * Callback pour récupérer la liste des oeuvres d'un artiste
+     * @return le callback
+     */
     private VolleyCallback callVolleyCallback(){
         return new VolleyCallback() {
             @Override
             public void onSuccess(final JSONObject response) {
-                museumApi.getArtist(artWorkList, response);
+                museumApi.getArtWorkByArtist(artWorkList, response);
             }
         };
     }
-
-//    public static <T> void addToRequestQueue(Request<T> req, String tag) {
-//
-//        // set the default tag if tag is empty
-//        req.setTag(TextUtils.isEmpty(tag) ? LOG_TAG : tag);
-//        mInstance.mRequestQueue.add(req);
-//    }
 
     @Override
     public void onBackPressed() {
@@ -151,44 +142,5 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-//    public static void getString(
-//            int method,
-//            String url,
-//            final Map<String, String> headers,
-//            Response.Listener<String> listener,
-//            Response.ErrorListener errorListener,
-//            boolean putInCache)
-//    {
-//        System.out.println("getJSONObject url: " + url);
-//
-//        StringRequest jsonObjReq = new StringRequest(method, url, listener, errorListener) {
-//            @Override
-//            public Map<String, String> getHeaders() throws AuthFailureError {
-//                if (headers == null) {
-//                    return new LinkedHashMap<>(0);
-//                } else {
-//                    return headers;
-//                }
-//            }
-//        };
-//
-//        jsonObjReq.setShouldCache(putInCache);
-//        addRequestPolicy(jsonObjReq);
-//
-//        // Adding request to request queue
-//        addToRequestQueue(jsonObjReq, "req_object_" + url.hashCode());
-//    }
-
-    public static void addRequestPolicy(Request<String> request)
-    {
-        request.setRetryPolicy(
-                new DefaultRetryPolicy(
-                        10000, // 10 000
-                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
-                )
-        );
     }
 }
