@@ -7,18 +7,22 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.rijskviewer.Interfaces.VolleyCallback;
 import com.example.rijskviewer.models.ArtWork;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class MuseumApi {
     private final static String TOKEN = "MvDNbZD9";
     private final static String NB_IMAGE = "100";//Only 10 by 10
 
-    public static List<ArtWork> readFromJson(Context applicationContext, final List<ArtWork> artWorkList) {
+    public List<ArtWork> readFromJson(final VolleyCallback callback, Context applicationContext) {
+        List<ArtWork> artWorkList = new ArrayList<>();
 //        https://www.rijksmuseum.nl/api/en/collection?key=MvDNbZD9&ps=100&format=json&principalMaker=George%20Hendrik%20Breitner
         String token = "MvDNbZD9";
         int nbImage = 100;
@@ -29,20 +33,21 @@ public class MuseumApi {
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                     (Request.Method.GET, artist_url, null, new Response.Listener<JSONObject>() {
                         @Override
-                        public void onResponse(JSONObject response) {
+                        public void onResponse(final JSONObject response) {
 //                                textView.setText("Response: " + response.toString());
-                            getArtist(artWorkList, response);
+                            callback.onSuccess(response);
                         }
                     }, new Response.ErrorListener() {
 
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            // TODO: Handle error
-                            System.out.println("error");
+                            System.out.println("Erreur lors de la récupération de l'url : " + error);
                         }
                     });
 
             Volley.newRequestQueue(applicationContext).add(jsonObjectRequest);
+            // TODO: Faire un  callback correct
+            Thread.sleep(1000);
         }catch(Exception e){
             System.out.println("Erreur : " + e);
         }
@@ -53,12 +58,12 @@ public class MuseumApi {
 //        else{
 //            System.out.println("Image non récupéré");
 //        }
-
         System.out.println("my artWorkList2 : " + artWorkList);
         return artWorkList;
     }
 
-    private static List<ArtWork> getArtist(List<ArtWork> artWorkList, JSONObject response){
+    public List<ArtWork> getArtist(List<ArtWork> artWorkList, JSONObject response){
+        System.out.println("getArtist");
         try {
             if(response.getInt("count") != 0){
                 //url = jres.getJSONArray("artObjects").getJSONObject(0).getJSONObject("webImage").getString("url");

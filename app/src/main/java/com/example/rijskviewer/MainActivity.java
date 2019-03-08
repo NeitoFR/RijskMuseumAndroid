@@ -19,17 +19,18 @@ import android.widget.ListView;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.example.rijskviewer.Interfaces.VolleyCallback;
 import com.example.rijskviewer.api.MuseumApi;
 import com.example.rijskviewer.models.ArtWork;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    private static MainActivity mInstance;
-
-    private RequestQueue mRequestQueue;
+    private MuseumApi museumApi;
     private ArtWork artWork;
     private List<ArtWork> artWorkList = new ArrayList<>();
 
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        museumApi = new MuseumApi();
 
         ListView artWorkListView = (ListView) findViewById(R.id.studentsListView);
 
@@ -47,8 +49,8 @@ public class MainActivity extends AppCompatActivity
 //        artWorkList.add(new ArtWork("secondAuthor", "secondTitle", "06-03-2018", "testUrl", 4));
 
 
-        artWorkList = MuseumApi.readFromJson(this.getApplicationContext(), artWorkList);
-
+        artWorkList = museumApi.readFromJson(callVolleyCallback(), this.getApplicationContext());
+        System.out.println("main activity : " + artWorkList);
         ArrayAdapter<ArtWork> arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, artWorkList);
 
         artWorkListView.setAdapter(arrayAdapter);
@@ -76,6 +78,15 @@ public class MainActivity extends AppCompatActivity
         viewPager = findViewById(R.id.pager);
         adapter = new ListFragmentCollections(getSupportFragmentManager());
         viewPager.setAdapter(adapter);
+    }
+
+    private VolleyCallback callVolleyCallback(){
+        return new VolleyCallback() {
+            @Override
+            public void onSuccess(final JSONObject response) {
+                museumApi.getArtist(artWorkList, response);
+            }
+        };
     }
 
 //    public static <T> void addToRequestQueue(Request<T> req, String tag) {
