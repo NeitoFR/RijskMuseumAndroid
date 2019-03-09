@@ -50,7 +50,7 @@ public class MuseumApi {
 
             Volley.newRequestQueue(applicationContext).add(jsonObjectRequest);
             // TODO: Faire un  callback correct
-            Thread.sleep(1000);
+            Thread.sleep(1250);
         }catch(Exception e){
             System.out.println("Erreur : " + e);
         }
