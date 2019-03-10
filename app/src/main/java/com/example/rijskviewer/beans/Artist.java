@@ -2,13 +2,13 @@ package com.example.rijskviewer.beans;
 
 public class Artist {
     private String author;
-    private String artWorkNumber;
+    private int artWorkNumber;
 
     public Artist(){
         super();
     }
 
-    //Getters
+    //Getters and setters
     public String getAuthor() {
         return author;
     }
@@ -17,11 +17,16 @@ public class Artist {
         this.author = author;
     }
 
-    public String getArtWorkNumber() {
+    public int getArtWorkNumber() {
         return artWorkNumber;
     }
 
-    public void setArtWorkNumber(String artWorkNumber) {
+    public void setArtWorkNumber(int artWorkNumber) {
         this.artWorkNumber = artWorkNumber;
     }
+
+    @Override
+    public String toString() {
+        return this.author + " " + this.artWorkNumber;
+}
 }

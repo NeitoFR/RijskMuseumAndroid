@@ -1,7 +1,6 @@
 package com.example.rijskviewer.beans;
 
 public class ArtWork extends Artist {
-    private Artist author;
     private String title;
     private String date;
     private String url;
@@ -11,7 +10,7 @@ public class ArtWork extends Artist {
         super();
     }
 
-    //Getters
+    //Getters and setters
     public String getTitle() {
         return title;
     }
@@ -46,6 +45,6 @@ public class ArtWork extends Artist {
 
     @Override
     public String toString() {
-        return this.author + " " + this.title + " " + this.date + " " + this.url + " " + this.index;
+        return super.toString() + " " + this.title + " " + this.date + " " + this.url + " " + this.index;
     }
 }

@@ -9,6 +9,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.rijskviewer.Interfaces.VolleyCallback;
 import com.example.rijskviewer.beans.ArtWork;
+import com.example.rijskviewer.beans.Artist;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,6 +24,7 @@ public class MuseumApi {
 
     /**
      * Lit une url qui renvoie un format JSON.
+     * Si artisteName renseigné, lit l'url pour un artiste sinon pour toute la collection.
      * @param callback
      * @param applicationContext
      * @param artistName
@@ -31,11 +33,15 @@ public class MuseumApi {
     public List<ArtWork> readFromJson(final VolleyCallback callback, Context applicationContext, String artistName) {
         List<ArtWork> artWorkList = new ArrayList<>();
 //        https://www.rijksmuseum.nl/api/en/collection?key=MvDNbZD9&ps=100&format=json&principalMaker=George%20Hendrik%20Breitner
-        String artist_url = "https://www.rijksmuseum.nl/api/en/collection?key=" + TOKEN + "&ps=" + NB_IMAGE + "&format=json&principalMaker=" + artistName;
+        String artistUrl = "https://www.rijksmuseum.nl/api/en/collection?key=" + TOKEN + "&format=json";
+
+        if(artistName != null){
+            artistUrl += "&ps=" + NB_IMAGE + "principalMaker=" + artistName;
+        }
 
         try {
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                    (Request.Method.GET, artist_url, null, new Response.Listener<JSONObject>() {
+                    (Request.Method.GET, artistUrl, null, new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(final JSONObject response) {
                             callback.onSuccess(response);
@@ -50,7 +56,7 @@ public class MuseumApi {
 
             Volley.newRequestQueue(applicationContext).add(jsonObjectRequest);
             // TODO: Faire un  callback correct
-            Thread.sleep(1250);
+            Thread.sleep(1500);
         }catch(Exception e){
             System.out.println("Erreur : " + e);
         }
@@ -68,9 +74,11 @@ public class MuseumApi {
         try {
             if(response.getInt("count") != 0){
                 JSONArray artList = response.getJSONArray("artObjects");
-                System.out.println("***"+artList.length());
+                System.out.println("*** Nombres d'oeuvres pour l'artiste selectionné : " + artList.length() + " ***");
+
                 for(int j = 0, b = 0; j < artList.length(); j++) {
                     JSONObject art = artList.getJSONObject(j);
+
                     if(!art.get("webImage").equals(null)) {
                         String[] tab = new String[3];
                         tab = art.get("longTitle").toString().split(",");
@@ -93,14 +101,14 @@ public class MuseumApi {
                 System.out.println("Pas d'image");
             }
         } catch (JSONException e) {
-            System.out.println("Erreur lors du parsing JSON" + e);
+            System.out.println("Erreur lors du parsing JSON : " + e);
         }
 
         return artistsList;
     }
 
     /**
-     * Récupère ls artistes.
+     * Récupère la liste des artistes.
      * @param artWorkList
      * @param response
      * @return la liste des artistes
@@ -108,22 +116,24 @@ public class MuseumApi {
     public List<ArtWork> getArtists(List<ArtWork> artWorkList, JSONObject response){
         try {
             if(response.getInt("count") != 0){
-                JSONObject firstFacets = response.getJSONObject("facets");
+                JSONArray firstFacets = response.getJSONArray("facets");
 
-                if(firstFacets.getJSONObject("name").equals("principalMaker")) {
-                    JSONArray facetsList = firstFacets.getJSONArray("facets");
-                    System.out.println("***" + facetsList.length());
+                for(int i = 0; i < firstFacets.length(); i++) {
+                    JSONObject facets = firstFacets.getJSONObject(i);
 
-                    for(int j = 0, b = 0; j < facetsList.length(); j++) {
-                        JSONObject art = facetsList.getJSONObject(j);
-                        if(!art.get("webImage").equals(null)) {
+                    if(facets.getString("name").equals("principalMaker")) {
+                        JSONArray facetsList = facets.getJSONArray("facets");
+                        System.out.println("*** Nombres d'artistes dans la liste getArtists : " + facetsList.length() + " ***");
+
+                        for(int j = 0, b = 0; j < facetsList.length(); j++) {
+                            JSONObject art = facetsList.getJSONObject(j);
                             ArtWork artWork = new ArtWork();
+
                             artWork.setAuthor(art.getString("key"));
-                            artWork.setArtWorkNumber(art.getString("value"));
+                            artWork.setArtWorkNumber(art.getInt("value"));
+                            artWork.setIndex(b++);
 
                             artWorkList.add(artWork);
-                        } else {
-                            System.out.println("Pas d'url pour cette image");
                         }
                     }
                 }
@@ -132,7 +142,7 @@ public class MuseumApi {
                 System.out.println("Pas d'image");
             }
         } catch (JSONException e) {
-            System.out.println("Erreur lors du parsing JSON" + e);
+            System.out.println("Erreur lors du parsing JSON : " + e);
         }
 
         return artWorkList;

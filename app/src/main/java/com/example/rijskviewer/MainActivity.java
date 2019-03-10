@@ -43,8 +43,11 @@ public class MainActivity extends AppCompatActivity
         ListView artWorkListView = (ListView) findViewById(R.id.artWorkListView);
 
         // Remplacer artistName par le nom de l'artiste cliqué par l'utilisateur
-        String artistName = "George Hendrik Breitner";
-        artWorkList = museumApi.readFromJson(callVolleyCallback(), this.getApplicationContext(), artistName);
+//        String artistName = "George Hendrik Breitner";
+        String artistName = null;
+        // Indiquer le nom de l'artiste pour faire appel à l'url avec l'artiste sinon mettre null est ce sera l'url pour toute la collection
+
+        artWorkList = museumApi.readFromJson(callVolleyCallback(artistName), this.getApplicationContext(), artistName);
 
         ArrayAdapter<ArtWork> arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, artWorkList);
 
@@ -64,10 +67,10 @@ public class MainActivity extends AppCompatActivity
         });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-//                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-//        drawer.addDrawerListener(toggle);
-//        toggle.syncState();
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -80,11 +83,22 @@ public class MainActivity extends AppCompatActivity
      * Callback pour récupérer la liste des oeuvres d'un artiste
      * @return le callback
      */
-    private VolleyCallback callVolleyCallback(){
+    private VolleyCallback callVolleyCallback(String artistName){
+        if(artistName != null){
+            System.out.println("Récupération de la liste des oeuvres pour l'artiste " + artistName);
+            return new VolleyCallback() {
+                @Override
+                public void onSuccess(final JSONObject response) {
+                    museumApi.getArtWorkByArtist(artWorkList, response);
+                }
+            };
+        }
+
+        System.out.println("Récupération de la liste des artistes");
         return new VolleyCallback() {
             @Override
             public void onSuccess(final JSONObject response) {
-                museumApi.getArtWorkByArtist(artWorkList, response);
+                museumApi.getArtists(artWorkList, response);
             }
         };
     }
