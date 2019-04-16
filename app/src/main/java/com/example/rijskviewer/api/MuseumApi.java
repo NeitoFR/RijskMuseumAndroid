@@ -1,15 +1,31 @@
 package com.example.rijskviewer.api;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.provider.Settings;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.Button;
+import android.widget.PopupWindow;
+import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkError;
+import com.android.volley.NoConnectionError;
+import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.ServerError;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.rijskviewer.Interfaces.VolleyCallback;
+import com.example.rijskviewer.R;
 import com.example.rijskviewer.beans.ArtWork;
-import com.example.rijskviewer.beans.Artist;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,8 +35,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MuseumApi {
-    private final static String TOKEN = "MvDNbZD9";
+    private final static String TOKEN = "QKkH603N";
     private final static String NB_IMAGE = "100";//Only 10 by 10
+    private static String ARTIST_URL = "https://www.rijksmuseum.nl/api/en/collection?key=" + TOKEN + "&format=json";
 
     /**
      * Lit une url qui renvoie un format JSON.
@@ -30,33 +47,72 @@ public class MuseumApi {
      * @param artistName
      * @return la liste des oeuvres pour un artiste provenant de l'url.
      */
-    public List<ArtWork> readFromJson(final VolleyCallback callback, Context applicationContext, String artistName) {
+    public List<ArtWork> readFromJson(final VolleyCallback callback, final Context applicationContext, String artistName) {
         List<ArtWork> artWorkList = new ArrayList<>();
 //        https://www.rijksmuseum.nl/api/en/collection?key=MvDNbZD9&ps=100&format=json&principalMaker=George%20Hendrik%20Breitner
-        String artistUrl = "https://www.rijksmuseum.nl/api/en/collection?key=" + TOKEN + "&format=json";
 
         if(artistName != null){
-            artistUrl += "&ps=" + NB_IMAGE + "principalMaker=" + artistName;
+            ARTIST_URL += "&ps=" + NB_IMAGE + "principalMaker=" + artistName;
         }
 
         try {
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                    (Request.Method.GET, artistUrl, null, new Response.Listener<JSONObject>() {
+                    (Request.Method.GET, ARTIST_URL, null, new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(final JSONObject response) {
+                            System.out.println("OnResponse");
                             callback.onSuccess(response);
                         }
                     }, new Response.ErrorListener() {
-
                         @Override
                         public void onErrorResponse(VolleyError error) {
                             System.out.println("Erreur lors de la récupération de l'url : " + error);
+                            //PopupWindow popupWindow = new PopupWindow(applicationContext);
+
+                            final Dialog dialog = new Dialog(applicationContext);
+                            dialog.setContentView(R.layout.network_error);
+
+                            Toolbar artistDialToolbar = dialog.findViewById(R.id.network_error_dial_toolbar);
+                            artistDialToolbar.setTitle("Activer le réseau");
+
+                            Button artistDialBtnYes = dialog.findViewById(R.id.network_error_dial_btn_yes);
+                            artistDialBtnYes.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
+                                    applicationContext.startActivity(intent);
+                                    dialog.dismiss();
+                                }
+                            });
+
+                            Button artistDialBtnNo = dialog.findViewById(R.id.network_error_dial_btn_no);
+                            artistDialBtnNo.setOnClickListener(new View.OnClickListener() {
+                                public void onClick(View v) {
+                                    dialog.dismiss();
+                                }
+                            });
+
+                            dialog.show();
+
+                            //Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
+                            //applicationContext.startActivity(intent);
+
+                            if (error instanceof TimeoutError || error instanceof NoConnectionError) {
+                            } else if (error instanceof AuthFailureError) {
+                                //TODO
+                            } else if (error instanceof ServerError) {
+                                //TODO
+                            } else if (error instanceof NetworkError) {
+                                //TODO
+                            } else if (error instanceof ParseError) {
+                                //TODO
+                            }
                         }
                     });
 
             Volley.newRequestQueue(applicationContext).add(jsonObjectRequest);
             // TODO: Faire un  callback correct
-            Thread.sleep(1500);
+            //Thread.sleep(2000);
         }catch(Exception e){
             System.out.println("Erreur : " + e);
         }

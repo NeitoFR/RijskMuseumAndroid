@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity
     private List<ArtWork> artWorkList = new ArrayList<>();
 
     private ViewPager viewPager;
-    private ListFragmentCollections adapter;
+    private ListFragmentCollections listFragmentCollections;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         museumApi = new MuseumApi();
 
+        // Voir pour un RecyclerView
         ListView artWorkListView = (ListView) findViewById(R.id.artWorkListView);
 
         // Remplacer artistName par le nom de l'artiste cliqué par l'utilisateur
@@ -47,7 +48,7 @@ public class MainActivity extends AppCompatActivity
         String artistName = null;
         // Indiquer le nom de l'artiste pour faire appel à l'url avec l'artiste sinon mettre null est ce sera l'url pour toute la collection
 
-        artWorkList = museumApi.readFromJson(callVolleyCallback(artistName), this.getApplicationContext(), artistName);
+        artWorkList = museumApi.readFromJson(callVolleyCallback(artistName), MainActivity.this, artistName);
 
         ArrayAdapter<ArtWork> arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, artWorkList);
 
@@ -75,8 +76,8 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         viewPager = findViewById(R.id.pager);
-        adapter = new ListFragmentCollections(getSupportFragmentManager());
-        viewPager.setAdapter(adapter);
+        listFragmentCollections = new ListFragmentCollections(getSupportFragmentManager());
+        viewPager.setAdapter(listFragmentCollections);
     }
 
     /**

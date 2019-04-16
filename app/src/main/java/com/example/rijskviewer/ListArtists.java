@@ -13,7 +13,7 @@ import android.widget.TextView;
  * A simple {@link Fragment} subclass.
  */
 public class ListArtists extends Fragment {
-TextView textView;
+    private TextView textView;
 
     public ListArtists() {
         // Required empty public constructor
