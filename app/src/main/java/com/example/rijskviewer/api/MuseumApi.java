@@ -79,9 +79,9 @@ public class MuseumApi {
                             artistDialBtnYes.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
+                                    dialog.dismiss();
                                     Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
                                     applicationContext.startActivity(intent);
-                                    dialog.dismiss();
                                 }
                             });
 

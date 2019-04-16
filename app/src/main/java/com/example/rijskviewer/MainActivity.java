@@ -1,9 +1,13 @@
 package com.example.rijskviewer;
 
+import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,6 +18,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.example.rijskviewer.Interfaces.VolleyCallback;
@@ -22,6 +27,7 @@ import com.example.rijskviewer.beans.ArtWork;
 
 import org.json.JSONObject;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +38,40 @@ public class MainActivity extends AppCompatActivity
 
     private ViewPager viewPager;
     private ListFragmentCollections listFragmentCollections;
+    private String artistName = null;
+
+    private Boolean net = false;
+
+    private void onload(){
+        if (!net) {
+            // Voir pour un RecyclerView
+            ListView artWorkListView = (ListView) findViewById(R.id.artWorkListView);
+            // Remplacer artistName par le nom de l'artiste cliqué par l'utilisateur
+            //String artistName = "George Hendrik Breitner";
+            // Indiquer le nom de l'artiste pour faire appel à l'url avec l'artiste sinon mettre null est ce sera l'url pour toute la collection
+            artWorkList = museumApi.readFromJson(callVolleyCallback(artistName), MainActivity.this, artistName);
+            net = artWorkList != null;
+            ArrayAdapter<ArtWork> arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, artWorkList);
+            artWorkListView.setAdapter(arrayAdapter);
+        }
+    }
+
+    @Override
+    protected void onStart(){
+        super.onStart();
+        System.out.println("Testing android");
+        Log.d("OnStart", "Starting");
+        onload();
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        System.out.println("Testing android resume");
+        Log.d("OnResume", "Starting");
+
+        onload();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,20 +79,9 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         museumApi = new MuseumApi();
+        Log.d("Oncreate", "Starting");
 
-        // Voir pour un RecyclerView
-        ListView artWorkListView = (ListView) findViewById(R.id.artWorkListView);
-
-        // Remplacer artistName par le nom de l'artiste cliqué par l'utilisateur
-//        String artistName = "George Hendrik Breitner";
-        String artistName = null;
-        // Indiquer le nom de l'artiste pour faire appel à l'url avec l'artiste sinon mettre null est ce sera l'url pour toute la collection
-
-        artWorkList = museumApi.readFromJson(callVolleyCallback(artistName), MainActivity.this, artistName);
-
-        ArrayAdapter<ArtWork> arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, artWorkList);
-
-        artWorkListView.setAdapter(arrayAdapter);
+        onload();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
