@@ -25,6 +25,7 @@ public class ArtWorkActivity extends AppCompatActivity {
         // récupération de données
         String author = getIntent().getExtras().getString("artwork_author") ;
         String title  = getIntent().getExtras().getString("artwork_title");
+        String desc  = getIntent().getExtras().getString("artwork_desc");
         String imageUrl = getIntent().getExtras().getString("artwork_image") ;
 
         //ini Views
@@ -32,8 +33,9 @@ public class ArtWorkActivity extends AppCompatActivity {
         CollapsingToolbarLayout collapsingToolbarLayout=findViewById(R.id.collapsingtoolbar_id);
         collapsingToolbarLayout.setTitleEnabled(true);
 
-        TextView tvTitle =findViewById(R.id.aa_anime_title);
-        TextView tvAuthor=findViewById(R.id.aa_maker);
+        TextView tvTitle = findViewById(R.id.aa_anime_title);
+        TextView tvAuthor = findViewById(R.id.aa_maker);
+        TextView tvDesc = findViewById(R.id.aa_description);
         final ImageView image = findViewById(R.id.aa_thumbnail);
 
 
@@ -41,7 +43,7 @@ public class ArtWorkActivity extends AppCompatActivity {
 
         tvTitle.setText(title);
         tvAuthor.setText(author);
-
+        tvDesc.setText(desc);
         RequestOptions requestOptions = new RequestOptions().centerCrop().placeholder(R.drawable.loading_shape).error(R.drawable.loading_shape);
 
 

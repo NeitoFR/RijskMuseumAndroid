@@ -78,7 +78,7 @@
 
         <TextView
             android:textColor="#fff"
-            android:text="Anime Details"
+            android:text="Artwork Details"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/aa_description"/>

@@ -15,6 +15,8 @@ import com.example.rijskviewer.activities.ArtWorkActivity;
 import com.example.rijskviewer.beans.ArtWork;
 import com.example.rijskviewer.R;
 
+import org.w3c.dom.Text;
+
 import java.util.List;
 
 public class ArtworkListAdapter extends RecyclerView.Adapter<ArtworkListAdapter.MyViewHolder> {
@@ -48,6 +50,7 @@ public class ArtworkListAdapter extends RecyclerView.Adapter<ArtworkListAdapter.
                 i.putExtra("artwork_author",mData.get(viewHolder.getAdapterPosition()).getAuthor());
                 i.putExtra("artwork_title",mData.get(viewHolder.getAdapterPosition()).getTitle());
                 i.putExtra("artwork_image",mData.get(viewHolder.getAdapterPosition()).getImage());
+                i.putExtra("artwork_desc",mData.get(viewHolder.getAdapterPosition()).getLongTitle());
 
                 mContext.startActivity(i);
             }
@@ -61,7 +64,6 @@ public class ArtworkListAdapter extends RecyclerView.Adapter<ArtworkListAdapter.
 
         holder.tvTitle.setText(mData.get(i).getTitle());
         holder.tvAuthor.setText((mData.get(i).getAuthor()));
-
         //charger l'image de l'url et la stocker dans l'imageview grâce à Glide
 
         Glide.with(mContext).load(mData.get(i).getImage()).apply(option).into(holder.imgThumbnail);
