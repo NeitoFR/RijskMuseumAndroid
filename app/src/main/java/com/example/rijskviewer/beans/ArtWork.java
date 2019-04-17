@@ -1,50 +1,53 @@
 package com.example.rijskviewer.beans;
 
 public class ArtWork extends Artist {
-    private String title;
-    private String date;
+    private String Title;
     private String image;
-    private int index;
+    private String LongTitle;
+    private String PrincipalMaker;
+
 
     public ArtWork(){
-        super();
+
     }
 
-    //Getters and setters
-    public String getTitle() {
-        return title;
+    public ArtWork(String title, String image, String longTitle, String principalMaker) {
+        Title = title;
+        this.image = image;
+        LongTitle = longTitle;
+        PrincipalMaker = principalMaker;
     }
+
 
     public void setTitle(String title) {
-        this.title = title;
+        Title = title;
     }
 
-    public String getDate() {
-        return date;
+    public void setPrincipalMaker(String principalMaker) {
+        PrincipalMaker = principalMaker;
     }
 
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public String getImage() {
-        return image;
+    public String getPrincipalMaker() {
+        return PrincipalMaker;
     }
 
     public void setImage(String image) {
         this.image = image;
     }
 
-    public int getIndex() {
-        return index;
+    public void setLongTitle(String longTitle) {
+        LongTitle = longTitle;
     }
 
-    public void setIndex(int index) {
-        this.index = index;
+    public String getTitle() {
+        return Title;
     }
 
-    @Override
-    public String toString() {
-        return super.toString() + " " + this.title + " " + this.date + " " + this.image + " " + this.index;
+    public String getImage() {
+        return image;
+    }
+
+    public String getLongTitle() {
+        return LongTitle;
     }
 }

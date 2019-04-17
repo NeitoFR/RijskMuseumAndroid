@@ -21,6 +21,7 @@ import com.example.rijskviewer.R;
 import com.example.rijskviewer.adapters.RecyclerViewAdapter;
 import com.example.rijskviewer.api.MuseumApi;
 import com.example.rijskviewer.beans.ArtWork;
+import com.example.rijskviewer.beans.Artist;
 
 import org.json.JSONObject;
 
@@ -30,7 +31,8 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private MuseumApi museumApi;
-    private List<ArtWork> artWorkList = new ArrayList<>();
+    private List<Artist> artWorkList = new ArrayList<>();
+
 
     private String artistName = null;
     private Boolean net = false;
@@ -144,6 +146,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onSuccess(final JSONObject response) {
                 museumApi.getArtists(artWorkList, response);
+//                museumApi.getArtWorkByArtist(artWorkList, response);
 
                 net = true;
                 toggleLoader();
@@ -162,7 +165,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void setUpdateRecyclerView(List<ArtWork> artWorkList) {
+    public void setUpdateRecyclerView(List<Artist> artWorkList) {
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerViewid);
         System.out.println("test");
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));

@@ -20,6 +20,9 @@ public class Artist {
     public int getArtWorkNumber() {
         return artWorkNumber;
     }
+    public String getArtWorkNumberString() {
+        return Integer.toString(artWorkNumber);
+    }
 
     public void setArtWorkNumber(int artWorkNumber) {
         this.artWorkNumber = artWorkNumber;

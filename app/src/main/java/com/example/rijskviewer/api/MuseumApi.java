@@ -23,11 +23,13 @@ import com.example.rijskviewer.Interfaces.VolleyCallback;
 import com.example.rijskviewer.R;
 import com.example.rijskviewer.activities.MainActivity;
 import com.example.rijskviewer.beans.ArtWork;
+import com.example.rijskviewer.beans.Artist;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MuseumApi {
@@ -117,13 +119,21 @@ public class MuseumApi {
         }
     }
 
+    public List<ArtWork> getArtworkList(String artist, JSONObject response) {
+        List<ArtWork> artWorkList = new ArrayList<>();
+
+
+
+        return  artWorkList;
+    }
+
     /**
      * Récupère la liste des oeuvres pour un artiste.
      * @param artistsList
      * @param response
      * @return la liste des oeuvres pour un artiste
      */
-    public List<ArtWork> getArtWorkByArtist(List<ArtWork> artistsList, JSONObject response){
+    public List<Artist> getArtWorkByArtist(List<Artist> artistsList, JSONObject response){
         try {
             if(response.getInt("count") != 0){
                 JSONArray artList = response.getJSONArray("artObjects");
@@ -140,9 +150,9 @@ public class MuseumApi {
                         ArtWork artWork = new ArtWork();
                         artWork.setAuthor(art.getString("principalOrFirstMaker"));
                         artWork.setTitle(art.getString("title"));
-                        artWork.setDate(date);
+//                        artWork.setDate(date);
                         artWork.setImage(art.getJSONObject("webImage").getString("url"));
-                        artWork.setIndex(b++);
+//                        artWork.setIndex(b++);
 
                         artistsList.add(artWork);
                     } else {
@@ -161,14 +171,14 @@ public class MuseumApi {
 
         return artistsList;
     }
-
+//    public void getArtisti()
     /**
      * Récupère la liste des artistes.
      * @param artWorkList
      * @param response
      * @return la liste des artistes
      */
-    public List<ArtWork> getArtists(List<ArtWork> artWorkList, JSONObject response){
+    public List<Artist> getArtists(List<Artist> artWorkList, JSONObject response){
         try {
             if(response.getInt("count") != 0){
                 JSONArray firstFacets = response.getJSONArray("facets");
@@ -186,7 +196,7 @@ public class MuseumApi {
 
                             artWork.setAuthor(art.getString("key"));
                             artWork.setArtWorkNumber(art.getInt("value"));
-                            artWork.setIndex(b++);
+//                            artWork.setIndex(b++);
 
                             artWorkList.add(artWork);
                         }
