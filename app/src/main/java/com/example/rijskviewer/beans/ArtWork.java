@@ -3,7 +3,7 @@ package com.example.rijskviewer.beans;
 public class ArtWork extends Artist {
     private String title;
     private String date;
-    private String url;
+    private String image;
     private int index;
 
     public ArtWork(){
@@ -27,12 +27,12 @@ public class ArtWork extends Artist {
         this.date = date;
     }
 
-    public String getUrl() {
-        return url;
+    public String getImage() {
+        return image;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public int getIndex() {
@@ -45,6 +45,6 @@ public class ArtWork extends Artist {
 
     @Override
     public String toString() {
-        return super.toString() + " " + this.title + " " + this.date + " " + this.url + " " + this.index;
+        return super.toString() + " " + this.title + " " + this.date + " " + this.image + " " + this.index;
     }
 }

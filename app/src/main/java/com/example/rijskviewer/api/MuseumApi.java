@@ -1,16 +1,12 @@
 package com.example.rijskviewer.api;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.provider.Settings;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
-import android.widget.PopupWindow;
-import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
@@ -25,13 +21,13 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.rijskviewer.Interfaces.VolleyCallback;
 import com.example.rijskviewer.R;
+import com.example.rijskviewer.activities.MainActivity;
 import com.example.rijskviewer.beans.ArtWork;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MuseumApi {
@@ -39,17 +35,21 @@ public class MuseumApi {
     private final static String NB_IMAGE = "100";//Only 10 by 10
     private static String ARTIST_URL = "https://www.rijksmuseum.nl/api/en/collection?key=" + TOKEN + "&format=json";
 
+    private final  MainActivity mainActivity;
+
+    public MuseumApi(final MainActivity mainActivity){
+        this.mainActivity = mainActivity;
+    }
+
     /**
      * Lit une url qui renvoie un format JSON.
      * Si artisteName renseigné, lit l'url pour un artiste sinon pour toute la collection.
      * @param callback
-     * @param applicationContext
      * @param artistName
      * @return la liste des oeuvres pour un artiste provenant de l'url.
      */
-    public List<ArtWork> readFromJson(final VolleyCallback callback, final Context applicationContext, String artistName) {
-        List<ArtWork> artWorkList = new ArrayList<>();
-//        https://www.rijksmuseum.nl/api/en/collection?key=MvDNbZD9&ps=100&format=json&principalMaker=George%20Hendrik%20Breitner
+    public void readFromJson(final VolleyCallback callback, String artistName) {
+//        https://www.rijksmuseum.nl/api/en/collection?key=QKkH603N&ps=100&format=json&principalMaker=George%20Hendrik%20Breitner
 
         if(artistName != null){
             ARTIST_URL += "&ps=" + NB_IMAGE + "principalMaker=" + artistName;
@@ -60,16 +60,15 @@ public class MuseumApi {
                     (Request.Method.GET, ARTIST_URL, null, new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(final JSONObject response) {
-                            System.out.println("OnResponse");
                             callback.onSuccess(response);
                         }
                     }, new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
                             System.out.println("Erreur lors de la récupération de l'url : " + error);
-                            //PopupWindow popupWindow = new PopupWindow(applicationContext);
+                            mainActivity.toggleLoader();
 
-                            final Dialog dialog = new Dialog(applicationContext);
+                            final Dialog dialog = new Dialog(mainActivity);
                             dialog.setContentView(R.layout.network_error);
 
                             Toolbar artistDialToolbar = dialog.findViewById(R.id.network_error_dial_toolbar);
@@ -81,7 +80,7 @@ public class MuseumApi {
                                 public void onClick(View v) {
                                     dialog.dismiss();
                                     Intent intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
-                                    applicationContext.startActivity(intent);
+                                    mainActivity.startActivity(intent);
                                 }
                             });
 
@@ -110,14 +109,12 @@ public class MuseumApi {
                         }
                     });
 
-            Volley.newRequestQueue(applicationContext).add(jsonObjectRequest);
+            Volley.newRequestQueue(mainActivity).add(jsonObjectRequest);
             // TODO: Faire un  callback correct
             //Thread.sleep(2000);
         }catch(Exception e){
             System.out.println("Erreur : " + e);
         }
-
-        return artWorkList;
     }
 
     /**
@@ -144,7 +141,7 @@ public class MuseumApi {
                         artWork.setAuthor(art.getString("principalOrFirstMaker"));
                         artWork.setTitle(art.getString("title"));
                         artWork.setDate(date);
-                        artWork.setUrl(art.getJSONObject("webImage").getString("url"));
+                        artWork.setImage(art.getJSONObject("webImage").getString("url"));
                         artWork.setIndex(b++);
 
                         artistsList.add(artWork);
@@ -152,6 +149,8 @@ public class MuseumApi {
                         System.out.println("Pas d'url pour cette image");
                     }
                 }
+
+                mainActivity.setUpdateRecyclerView(artistsList);
             } else {
                 System.out.println(response.getInt("count"));
                 System.out.println("Pas d'image");
@@ -193,6 +192,8 @@ public class MuseumApi {
                         }
                     }
                 }
+
+                mainActivity.setUpdateRecyclerView(artWorkList);
             } else {
                 System.out.println(response.getInt("count"));
                 System.out.println("Pas d'image");
